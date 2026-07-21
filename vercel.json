@@ -1,0 +1,33 @@
+{
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
+    { "source": "/400", "destination": "/errors/400.html" },
+    { "source": "/401", "destination": "/errors/401.html" },
+    { "source": "/403", "destination": "/errors/403.html" },
+    { "source": "/429", "destination": "/errors/429.html" },
+    { "source": "/500", "destination": "/errors/500.html" },
+    { "source": "/501", "destination": "/errors/501.html" },
+    { "source": "/502", "destination": "/errors/502.html" },
+    { "source": "/503", "destination": "/errors/503.html" },
+    { "source": "/504", "destination": "/errors/504.html" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" },
+        { "key": "Strict-Transport-Security", "value": "max-age=63072000; includeSubDomains; preload" }
+      ]
+    },
+    {
+      "source": "/script.js",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    }
+  ]
+}

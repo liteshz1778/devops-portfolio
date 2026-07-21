@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>404 Not Found — Litesh Zadane</title>
+<meta name="description" content="Not Found">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A0D12;
+  --surface:#12161D;
+  --surface-alt:#171D26;
+  --border:#232B36;
+  --text:#E7EAEE;
+  --text-dim:#8B94A3;
+  --text-faint:#586171;
+  --teal:#4FD1C5;
+  --amber:#F0A868;
+  --red:#F0716E;
+  --display:'Space Grotesk', sans-serif;
+  --body:'Inter', sans-serif;
+  --mono:'JetBrains Mono', monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  background:var(--bg);color:var(--text);font-family:var(--body);
+  display:flex;align-items:center;justify-content:center;padding:24px;
+}
+a{color:inherit;text-decoration:none;}
+.card{
+  max-width:560px;width:100%;background:var(--surface);
+  border:1px solid var(--border);border-radius:10px;overflow:hidden;
+  box-shadow:0 30px 80px -30px rgba(0,0,0,0.7);
+}
+.term-bar{
+  display:flex;align-items:center;gap:8px;padding:10px 14px;
+  background:var(--surface-alt);border-bottom:1px solid var(--border);
+}
+.term-dot{width:10px;height:10px;border-radius:50%;}
+.term-bar .t1{background:var(--red);}.term-bar .t2{background:var(--amber);}.term-bar .t3{background:var(--teal);}
+.term-title{font-family:var(--mono);font-size:11px;color:var(--text-faint);margin-left:8px;}
+.term-body{padding:28px 26px 30px;font-family:var(--mono);font-size:13.5px;line-height:1.9;}
+.prompt{color:var(--teal);}
+.out-err{color:var(--red);}
+.out-dim{color:var(--text-faint);}
+.status-label{
+  font-family:var(--mono);font-size:11px;color:var(--text-faint);
+  letter-spacing:0.06em;text-transform:uppercase;margin-bottom:14px;
+}
+.code{
+  font-family:var(--display);font-size:56px;font-weight:600;color:var(--text);
+  letter-spacing:-0.02em;margin:18px 0 6px;
+}
+.msg{color:var(--text-dim);font-size:15px;font-family:var(--body);margin-bottom:26px;}
+.btn-row{display:flex;gap:12px;flex-wrap:wrap;}
+.btn{
+  font-family:var(--mono);font-size:13px;padding:11px 20px;border-radius:6px;
+  display:inline-flex;align-items:center;gap:8px;transition:.2s;
+}
+.btn-primary{background:var(--teal);color:#0A0D12;font-weight:600;}
+.btn-primary:hover{background:#6be0d5;}
+.btn-ghost{border:1px solid var(--border);color:var(--text-dim);}
+.btn-ghost:hover{border-color:var(--text-dim);color:var(--text);}
+.cursor{display:inline-block;width:7px;height:14px;background:var(--teal);vertical-align:middle;animation:blink 1s step-end infinite;}
+@keyframes blink{50%{opacity:0;}}
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="term-bar">
+      <span class="term-dot t1"></span><span class="term-dot t2"></span><span class="term-dot t3"></span>
+      <span class="term-title">kubectl — eks-prod-cluster</span>
+    </div>
+    <div class="term-body">
+      <div><span class="prompt">$</span> kubectl get route --path=requested</div>
+      <div class="out-err">Error from server (NotFound): route not found</div>
+
+      <div class="code">404</div>
+      <div class="status-label">Not Found</div>
+      <p class="msg">This page isn't available right now — please check back again later.</p>
+
+      <div class="btn-row">
+        <a class="btn btn-primary" href="/">Back to home →</a>
+        <a class="btn btn-ghost" href="https://github.com/liteshz1778" target="_blank" rel="noopener">View GitHub</a>
+      </div>
+
+      <div style="margin-top:22px;color:var(--text-faint);">
+        <span class="prompt">$</span> <span class="cursor"></span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

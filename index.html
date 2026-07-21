@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Litesh Zadane — AWS DevOps Engineer</title>
+<meta name="description" content="Litesh Zadane, AWS DevOps Engineer. Infrastructure as Code, Kubernetes, CI/CD, and cloud automation.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0A0D12;
+    --surface:#12161D;
+    --surface-alt:#171D26;
+    --border:#232B36;
+    --text:#E7EAEE;
+    --text-dim:#8B94A3;
+    --text-faint:#586171;
+    --teal:#4FD1C5;
+    --amber:#F0A868;
+    --blue:#5B9DF9;
+    --red:#F0716E;
+    --display: 'Space Grotesk', sans-serif;
+    --body: 'Inter', sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--body);
+    line-height:1.6;
+    overflow-x:hidden;
+  }
+  a{color:inherit;text-decoration:none;}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 24px;}
+
+  /* ---------- Pipeline nav ---------- */
+  .pipeline-nav{
+    position:sticky;top:0;z-index:100;
+    background:rgba(10,13,18,0.88);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);
+  }
+  .pipeline-nav .wrap{
+    display:flex;align-items:center;justify-content:space-between;
+    height:60px;
+  }
+  .brand-group{display:flex;align-items:center;gap:16px;}
+  .brand{font-family:var(--mono);font-size:13px;color:var(--text-dim);letter-spacing:0.02em;}
+  .brand b{color:var(--text);}
+  .live-clock{
+    font-family:var(--mono);font-size:11px;color:var(--text-faint);
+    display:flex;align-items:center;gap:6px;
+  }
+  .live-clock .pulse-dot{
+    width:6px;height:6px;border-radius:50%;background:var(--teal);
+    box-shadow:0 0 6px var(--teal);animation:pulse 2s ease-in-out infinite;
+  }
+  .stages{display:flex;gap:2px;align-items:center;}
+  .stage-link{
+    font-family:var(--mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;
+    color:var(--text-faint);padding:8px 14px;border-radius:3px;
+    display:flex;align-items:center;gap:7px;transition:color .2s;
+    cursor:pointer;
+  }
+  .stage-link .dot{width:6px;height:6px;border-radius:50%;background:var(--text-faint);transition:background .3s,box-shadow .3s;}
+  .stage-link.active{color:var(--text);}
+  .stage-link.active .dot{background:var(--teal);box-shadow:0 0 8px var(--teal);}
+  .stage-link:hover{color:var(--text);}
+  @media (max-width:720px){
+    .stage-link span.label{display:none;}
+    .stages{gap:10px;}
+    .live-clock{display:none;}
+  }
+
+  /* ---------- Vertical pipeline rail ---------- */
+  .rail{
+    position:fixed;left:32px;top:0;bottom:0;width:1px;
+    background:var(--border);z-index:1;
+    display:none;
+  }
+  @media (min-width:1120px){.rail{display:block;}}
+  .rail-fill{
+    position:absolute;left:0;top:0;width:1px;background:var(--teal);
+    height:0%;transition:height .15s linear;
+    box-shadow:0 0 10px var(--teal);
+  }
+
+  /* ---------- Hero ---------- */
+  .hero{padding:100px 0 80px;position:relative;}
+  .eyebrow{
+    font-family:var(--mono);font-size:12px;color:var(--teal);
+    letter-spacing:0.12em;text-transform:uppercase;margin-bottom:20px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .eyebrow::before{content:'';width:8px;height:8px;background:var(--teal);border-radius:50%;
+    box-shadow:0 0 10px var(--teal);animation:pulse 2s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+  h1{
+    font-family:var(--display);font-size:clamp(38px,6vw,64px);font-weight:600;
+    line-height:1.05;letter-spacing:-0.02em;max-width:820px;
+  }
+  h1 .accent{color:var(--teal);}
+  .hero-sub{
+    font-size:17px;color:var(--text-dim);max-width:560px;margin-top:22px;
+  }
+  .hero-meta{
+    display:flex;flex-wrap:wrap;gap:24px;margin-top:36px;
+    font-family:var(--mono);font-size:13px;color:var(--text-faint);
+  }
+  .hero-meta a{color:var(--text-dim);border-bottom:1px solid transparent;transition:.2s;}
+  .hero-meta a:hover{color:var(--teal);border-color:var(--teal);}
+
+  /* terminal */
+  .terminal{
+    margin-top:56px;background:var(--surface);border:1px solid var(--border);
+    border-radius:8px;overflow:hidden;max-width:640px;
+    box-shadow:0 20px 60px -20px rgba(0,0,0,0.6);
+  }
+  .term-bar{
+    display:flex;align-items:center;gap:8px;padding:10px 14px;
+    background:var(--surface-alt);border-bottom:1px solid var(--border);
+  }
+  .term-dot{width:10px;height:10px;border-radius:50%;}
+  .term-bar .t1{background:#F0716E;}.term-bar .t2{background:#F0A868;}.term-bar .t3{background:#4FD1C5;}
+  .term-title{font-family:var(--mono);font-size:11px;color:var(--text-faint);margin-left:8px;}
+  .term-body{padding:18px 20px;font-family:var(--mono);font-size:13px;min-height:130px;}
+  .term-line{color:var(--text-dim);margin-bottom:6px;}
+  .term-line .prompt{color:var(--teal);}
+  .term-out{color:var(--text-faint);white-space:pre;}
+  .cursor{display:inline-block;width:7px;height:14px;background:var(--teal);vertical-align:middle;animation:blink 1s step-end infinite;}
+  @keyframes blink{50%{opacity:0;}}
+
+  /* ---------- Live stats ---------- */
+  #stats{padding:40px 0;border-top:1px solid var(--border);}
+  .stats-grid{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+    gap:20px;text-align:center;
+  }
+  .stat-num{
+    font-family:var(--display);font-size:36px;font-weight:600;color:var(--teal);
+  }
+  .stat-label{
+    font-family:var(--mono);font-size:11px;color:var(--text-faint);
+    text-transform:uppercase;margin-top:6px;letter-spacing:0.04em;
+  }
+
+  /* ---------- Section shell ---------- */
+  section{padding:64px 0;border-top:1px solid var(--border);position:relative;}
+  .sec-head{display:flex;align-items:baseline;gap:16px;margin-bottom:36px;flex-wrap:wrap;}
+  .sec-num{font-family:var(--mono);font-size:12px;color:var(--text-faint);}
+  .sec-title{font-family:var(--display);font-size:26px;font-weight:600;}
+  .status-chip{
+    font-family:var(--mono);font-size:10px;letter-spacing:0.08em;text-transform:uppercase;
+    padding:3px 9px;border-radius:100px;border:1px solid;margin-left:auto;
+  }
+  .status-chip.pass{color:var(--teal);border-color:rgba(79,209,197,0.4);background:rgba(79,209,197,0.08);}
+  .status-chip.warn{color:var(--amber);border-color:rgba(240,168,104,0.4);background:rgba(240,168,104,0.08);}
+  .status-chip.info{color:var(--blue);border-color:rgba(91,157,249,0.4);background:rgba(91,157,249,0.08);}
+
+  /* ---------- About ---------- */
+  .about-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:48px;}
+  @media (max-width:780px){.about-grid{grid-template-columns:1fr;}}
+  .about-grid p{color:var(--text-dim);margin-bottom:16px;font-size:15px;}
+  .about-grid p b{color:var(--text);font-weight:600;}
+  .facts{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:20px 22px;}
+  .fact-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;}
+  .fact-row:last-child{border-bottom:none;}
+  .fact-row .k{color:var(--text-faint);font-family:var(--mono);}
+  .fact-row .v{color:var(--text);text-align:right;}
+
+  /* ---------- Skills / architecture groups ---------- */
+  .arch-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;}
+  .arch-card{
+    background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:18px 20px;
+    transition:border-color .2s,transform .2s;
+  }
+  .arch-card:hover{border-color:var(--teal);transform:translateY(-2px);}
+  .arch-card .arch-label{
+    font-family:var(--mono);font-size:11px;color:var(--teal);letter-spacing:0.06em;
+    text-transform:uppercase;margin-bottom:10px;display:block;
+  }
+  .arch-card p{font-size:13.5px;color:var(--text-dim);}
+
+  /* ---------- Experience timeline ---------- */
+  .exp-item{
+    display:grid;grid-template-columns:130px 1fr;gap:28px;padding:26px 0;
+    border-bottom:1px solid var(--border);
+  }
+  .exp-item:last-child{border-bottom:none;}
+  @media (max-width:640px){.exp-item{grid-template-columns:1fr;gap:8px;}}
+  .exp-time{font-family:var(--mono);font-size:12px;color:var(--text-faint);padding-top:3px;}
+  .exp-role{font-family:var(--display);font-size:18px;font-weight:600;margin-bottom:2px;}
+  .exp-org{font-size:13.5px;color:var(--teal);margin-bottom:2px;}
+  .exp-domain{font-size:12.5px;color:var(--text-faint);margin-bottom:12px;font-style:italic;}
+  .exp-list{list-style:none;}
+  .exp-list li{
+    position:relative;padding-left:18px;font-size:14px;color:var(--text-dim);margin-bottom:8px;
+  }
+  .exp-list li::before{content:'›';position:absolute;left:0;color:var(--text-faint);font-family:var(--mono);}
+
+  /* ---------- Certifications ---------- */
+  .cert-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;}
+  .cert-group-title{
+    font-family:var(--mono);font-size:11px;color:var(--text-faint);text-transform:uppercase;
+    letter-spacing:0.08em;margin-bottom:10px;
+  }
+  .cert-row{
+    display:flex;align-items:center;gap:10px;padding:9px 0;font-size:13.5px;color:var(--text-dim);
+    border-bottom:1px solid var(--border);
+  }
+  .cert-row:last-child{border-bottom:none;}
+  .cert-check{color:var(--teal);font-family:var(--mono);font-size:12px;}
+  a.cert-row{transition:color .2s;}
+  a.cert-row:hover{color:var(--teal);}
+
+  /* ---------- Repos / connect ---------- */
+  .repo-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;}
+  .repo-card{
+    display:block;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:18px 20px;
+    transition:border-color .2s;
+  }
+  .repo-card:hover{border-color:var(--blue);}
+  .repo-name{
+    font-family:var(--mono);font-size:14px;color:var(--blue);margin-bottom:6px;
+    display:flex;align-items:flex-start;gap:8px;
+    overflow-wrap:anywhere;
+    word-break:break-word;
+    line-height:1.4;
+  }
+  .repo-name::before{content:'⌥';color:var(--text-faint);flex-shrink:0;margin-top:1px;}
+  .repo-desc{font-size:13px;color:var(--text-dim);margin-bottom:10px;}
+  .repo-lang{font-family:var(--mono);font-size:11px;color:var(--text-faint);}
+  .repo-row-more{
+    font-family:var(--mono);font-size:12.5px;color:var(--text-dim);
+    border-bottom:1px solid var(--border);padding-bottom:2px;transition:.2s;
+  }
+  .repo-row-more:hover{color:var(--blue);border-color:var(--blue);}
+
+  /* ---------- Contact / footer ---------- */
+  .contact-cta{
+    text-align:center;padding:80px 0 40px;
+  }
+  .contact-cta h2{font-family:var(--display);font-size:clamp(28px,4vw,42px);font-weight:600;margin-bottom:14px;}
+  .contact-cta p{color:var(--text-dim);font-size:15px;margin-bottom:32px;}
+  .cta-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
+  .btn{
+    font-family:var(--mono);font-size:13px;padding:12px 22px;border-radius:6px;
+    display:inline-flex;align-items:center;gap:8px;transition:.2s;
+  }
+  .btn-primary{background:var(--teal);color:#0A0D12;font-weight:600;}
+  .btn-primary:hover{background:#6be0d5;}
+  .btn-ghost{border:1px solid var(--border);color:var(--text-dim);}
+  .btn-ghost:hover{border-color:var(--text-dim);color:var(--text);}
+
+  footer{
+    padding:24px 0 40px;text-align:center;font-family:var(--mono);
+    font-size:11.5px;color:var(--text-faint);border-top:1px solid var(--border);
+  }
+  footer .uptime-line{margin-top:6px;color:var(--teal);}
+
+  /* ---------- Back to top ---------- */
+  .back-to-top{
+    position:fixed;right:24px;bottom:24px;z-index:90;
+    width:42px;height:42px;border-radius:8px;
+    background:var(--surface);border:1px solid var(--border);
+    color:var(--text-dim);font-family:var(--mono);font-size:16px;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;opacity:0;pointer-events:none;
+    transform:translateY(8px);
+    transition:opacity .25s,transform .25s,border-color .2s,color .2s;
+  }
+  .back-to-top.visible{opacity:1;pointer-events:auto;transform:translateY(0);}
+  .back-to-top:hover{border-color:var(--teal);color:var(--teal);}
+  @media (max-width:640px){
+    .back-to-top{right:16px;bottom:16px;width:38px;height:38px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="rail"><div class="rail-fill" id="railFill"></div></div>
+
+<nav class="pipeline-nav">
+  <div class="wrap">
+    <div class="brand-group">
+      <div class="brand"><b>litesh@devops</b>:~$</div>
+      <div class="live-clock">
+        <span class="pulse-dot"></span>
+        <span id="clockText">--:--:-- UTC</span>
+      </div>
+    </div>
+    <div class="stages" id="stages">
+      <a class="stage-link" data-target="about"><span class="dot"></span><span class="label">build</span></a>
+      <a class="stage-link" data-target="skills"><span class="dot"></span><span class="label">test</span></a>
+      <a class="stage-link" data-target="experience"><span class="dot"></span><span class="label">deploy</span></a>
+      <a class="stage-link" data-target="certifications"><span class="dot"></span><span class="label">monitor</span></a>
+      <a class="stage-link" data-target="contact"><span class="dot"></span><span class="label">connect</span></a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">pipeline status: live</div>
+    <h1>Litesh Zadane builds infrastructure that<span class="accent"> ships itself.</span></h1>
+    <p class="hero-sub">AWS DevOps Engineer — 6.5 years in IT, 4+ years turning manual ops into Terraform modules, Jenkins pipelines, and self-healing Kubernetes clusters. Currently at LTIMindtree on Western Union's payments infrastructure.</p>
+    <div class="hero-meta">
+		<a href="mailto:zadane1778.litesh@gmail.com">zadane1778.litesh@gmail.com</a>
+		<a href="tel:+918788485192">+91 8788485192</a>
+		<a href="https://github.com/liteshz1778" target="_blank" rel="noopener">github.com/liteshz1778</a>
+		<a href="https://hub.docker.com/u/liteshz" target="_blank" rel="noopener">hub.docker.com/u/liteshz</a>
+		<span>Pune, Maharashtra, India</span>
+	</div>
+
+    <div class="terminal">
+      <div class="term-bar">
+        <span class="term-dot t1"></span><span class="term-dot t2"></span><span class="term-dot t3"></span>
+        <span class="term-title">kubectl — eks-prod-cluster</span>
+      </div>
+      <div class="term-body" id="termBody"></div>
+    </div>
+  </div>
+</header>
+
+<section id="stats">
+  <div class="wrap">
+    <div class="stats-grid">
+      <div>
+        <div class="stat-num" data-target="6.5" data-suffix="+" id="stat1">0</div>
+        <div class="stat-label">years IT experience</div>
+      </div>
+      <div>
+        <div class="stat-num" data-target="4" data-suffix="+" id="stat2">0</div>
+        <div class="stat-label">years DevOps</div>
+      </div>
+      <div>
+        <div class="stat-num" data-target="20" data-suffix="+" id="stat3">0</div>
+        <div class="stat-label">AWS services used</div>
+      </div>
+      <div>
+        <div class="stat-num" data-target="42" data-suffix="" id="stat4">0</div>
+        <div class="stat-label">public repos</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="about">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">01</span>
+      <span class="sec-title">build — about</span>
+      <span class="status-chip pass">passed</span>
+    </div>
+    <div class="about-grid">
+      <div>
+        <p>I design, automate, and manage cloud infrastructure on AWS — <b>Infrastructure as Code with Terraform</b>, <b>CI/CD with Jenkins</b>, containers with <b>Docker</b>, orchestration on <b>Kubernetes/EKS</b>, and configuration management with <b>Ansible</b>.</p>
+        <p>My work sits at the intersection of reliability and speed: keeping environments up across Dev, QA, UAT, Pre-Prod, and Production, while cutting the manual steps between a commit and a running service.</p>
+        <p>Recent projects have been in <b>financial services and payments</b> — Western Union money transfer systems and Global Payments' unified commerce platform — where availability and access control aren't optional.</p>
+      </div>
+      <div class="facts">
+        <div class="fact-row"><span class="k">role</span><span class="v">AWS DevOps Engineer</span></div>
+        <div class="fact-row"><span class="k">experience</span><span class="v">6.5 yrs IT / 4+ yrs DevOps</span></div>
+        <div class="fact-row"><span class="k">current</span><span class="v">LTIMindtree — Western Union</span></div>
+        <div class="fact-row"><span class="k">domain</span><span class="v">Financial Services, Payments</span></div>
+        <div class="fact-row"><span class="k">education</span><span class="v">MCA, SPPU (2022)</span></div>
+        <div class="fact-row"><span class="k">languages</span><span class="v">English, Hindi, Marathi</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="skills">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">02</span>
+      <span class="sec-title">test — technical skills</span>
+      <span class="status-chip pass">passed</span>
+    </div>
+    <div class="arch-grid">
+      <div class="arch-card">
+        <span class="arch-label">Cloud Platform</span>
+        <p>AWS — EC2, VPC, IAM, S3, EBS, EFS, Elastic IP, AMI, Auto Scaling, ALB/NLB, CloudWatch, CloudTrail, SNS, Lambda, RDS, ECR, EKS</p>
+      </div>
+      <div class="arch-card">
+        <span class="arch-label">Infrastructure as Code</span>
+        <p>Terraform (modules, .tf/.tfvars, state management), Helm charts for Kubernetes releases</p>
+      </div>
+      <div class="arch-card">
+        <span class="arch-label">Containers & Orchestration</span>
+        <p>Docker, Kubernetes/EKS — Deployments, StatefulSets, HPA, ConfigMaps, Secrets, RBAC, Ingress, Network Policies</p>
+      </div>
+      <div class="arch-card">
+        <span class="arch-label">CI/CD</span>
+        <p>Jenkins Declarative Pipelines — build, test, and deploy automation, plus troubleshooting and fixes</p>
+      </div>
+      <div class="arch-card">
+        <span class="arch-label">Configuration Management</span>
+        <p>Ansible — playbooks, role management, user provisioning, ansible-vault encryption/decryption</p>
+      </div>
+      <div class="arch-card">
+        <span class="arch-label">Monitoring & Logging</span>
+        <p>CloudWatch, Grafana, Prometheus, EFK Stack, Splunk — dashboards, alerts, log aggregation</p>
+      </div>
+      <div class="arch-card">
+        <span class="arch-label">Scripting & Languages</span>
+        <p>Python (Boto3), Shell scripting, Node.js, Core Java, SQL/MySQL, MongoDB</p>
+      </div>
+      <div class="arch-card">
+        <span class="arch-label">Tooling</span>
+        <p>Git/GitHub, Maven, Postman & REST Assured for API testing, Jira, Rally, VS Code</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="experience">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">03</span>
+      <span class="sec-title">deploy — experience</span>
+      <span class="status-chip pass">passed</span>
+    </div>
+
+    <div class="exp-item">
+      <div class="exp-time">2024 — 2026</div>
+      <div>
+        <div class="exp-role">Sr. Test Engineer / AWS DevOps Engineer</div>
+        <div class="exp-org">LTIMindtree — Client: Western Union</div>
+        <div class="exp-domain">Financial Services · Digital Payments · Money Transfer</div>
+        <ul class="exp-list">
+          <li>Provisioned and maintained AWS infrastructure across Dev, QA, UAT, Pre-Prod, and Production</li>
+          <li>Automated infrastructure with Terraform, config management with Ansible, and maintained Helm charts for Kubernetes</li>
+          <li>Built Jenkins Declarative Pipelines for CI/CD, and deployed containerized apps on EKS with Deployments, StatefulSets, and Ingress</li>
+          <li>Configured CloudWatch, Grafana, Prometheus, and SNS for monitoring; analyzed logs via the EFK Stack</li>
+          <li>Managed RDS, S3 backups, Lambda functions, and EC2 resources across Name Standardization, US Tax Remittance, and MTCN tracking projects</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="exp-item">
+      <div class="exp-time">2022 — 2023</div>
+      <div>
+        <div class="exp-role">Test Analyst / Jr. AWS DevOps Engineer</div>
+        <div class="exp-org">Bitwise Solutions Pvt. Ltd. — Client: Global Payments</div>
+        <div class="exp-domain">Payment Processing</div>
+        <ul class="exp-list">
+          <li>Designed and maintained AWS infrastructure for the Unified Commerce Platform (Dublin, Decryptor, BNPL/TSYS enhancements)</li>
+          <li>Configured IAM, CloudTrail, VPC Peering, VPN, and Transit Gateways for secure, compliant access</li>
+          <li>Automated provisioning with Terraform and managed Kubernetes deployments on EKS</li>
+          <li>Built Jenkins CI/CD pipelines and maintained IaC repositories with effective branching strategies</li>
+          <li>Developed Lambda functions for scheduled automation and cloud cost optimization</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="exp-item">
+      <div class="exp-time">2021 — 2022</div>
+      <div>
+        <div class="exp-role">QA Engineer</div>
+        <div class="exp-org">QualityKiosk Technologies</div>
+        <div class="exp-domain">Banking — HDFC AutoFirst Loan, Axis Bank Sankalp</div>
+        <ul class="exp-list">
+          <li>Prepared and executed test cases from business requirements; functional, regression, and integration testing</li>
+          <li>Logged and tracked defects, validated fixes with developers and business analysts</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="exp-item">
+      <div class="exp-time">2019 — 2021</div>
+      <div>
+        <div class="exp-role">QA Engineer</div>
+        <div class="exp-org">Kastham Technologies</div>
+        <div class="exp-domain">TradeStation (USA/UK), EliNext Group (Germany), Redknee InBill (Canada)</div>
+        <ul class="exp-list">
+          <li>Executed manual functional and regression testing across four international client accounts</li>
+          <li>Prepared test scenarios, reported defects, and worked cross-functionally to ensure product quality</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="certifications">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">04</span>
+      <span class="sec-title">monitor — certifications</span>
+      <span class="status-chip pass">passed</span>
+    </div>
+    <div class="cert-grid">
+      <div>
+        <div class="cert-group-title">AWS</div>
+        <a class="cert-row" href="https://www.credly.com/badges/4b4a07da-2f17-4f1e-a7d3-8e8f2d9840f3/public_url" target="_blank" rel="noopener"><span class="cert-check">✓</span>AWS Certified Cloud Practitioner (CLF-C02)</a>
+      </div>
+      <div>
+        <div class="cert-group-title">DevOps & Cloud</div>
+		<a class="cert-row" href="https://drive.google.com/file/d/1OXgvT6BqFUJUmI0Ptsx9UCZpzEe6P09r/view?usp=sharing" target="_blank" rel="noopener"><span class="cert-check">✓</span>Certified Kubernetes Administrator (CKA) with Practice Tests</a>
+        <a class="cert-row" href="https://drive.google.com/file/d/1za4R7vW9BiBj8br8CqwAgN-_w2k53ZOo/view?usp=sharing" target="_blank" rel="noopener"><span class="cert-check">✓</span>Helm for Beginners</a>
+		<a class="cert-row" href="https://drive.google.com/file/d/1hFJfO7uy8Bmp5AzfwckwV6vWiZSdDafA/view?usp=sharing" target="_blank" rel="noopener"><span class="cert-check">✓</span>Terraform Basic Training</a>
+        <a class="cert-row" href="https://drive.google.com/file/d/1JxCQ30G57xE5-FO89owgsiDf-6UsOGMl/view?usp=sharing" target="_blank" rel="noopener"><span class="cert-check">✓</span>Ansible Basic Training</a>
+        <a class="cert-row" href="https://drive.google.com/file/d/1VId1SE8SGYMx5INRwm32GpGJWgmzpRpr/view?usp=sharing" target="_blank" rel="noopener"><span class="cert-check">✓</span>Ansible Advanced Training</a>
+      </div>
+      <div>
+        <div class="cert-group-title">API Testing</div>
+        <a class="cert-row" href="https://drive.google.com/file/d/1ZDgOKyPGfd_nFa-uc-7gtHqW1usqID0k/view?usp=sharing" target="_blank" rel="noopener"><span class="cert-check">✓</span>REST API Testing & Automation Using Postman</a>
+        <a class="cert-row" href="https://drive.google.com/file/d/16E2eHr2bgScjb9_4tCHXx4Zk4_zFjn68/view?usp=sharing" target="_blank" rel="noopener"><span class="cert-check">✓</span>REST API Automation With Rest Assured</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="repos">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num">05</span>
+      <span class="sec-title">artifact registry — from GitHub</span>
+      <span class="status-chip info" id="repoCountChip">42 repos</span>
+    </div>
+    <div class="repo-grid" id="repoGrid">
+      <!-- Static fallback, shown only if the live GitHub API fetch fails or is rate-limited -->
+      <a class="repo-card" href="https://github.com/liteshz1778/helm-charts" target="_blank" rel="noopener">
+        <div class="repo-name">helm-charts</div>
+        <div class="repo-desc">Reusable Helm charts for Kubernetes app deployment — Deployments, Services, ConfigMaps, Secrets, StatefulSets, PV/PVC.</div>
+        <div class="repo-lang">Go Template</div>
+      </a>
+      <a class="repo-card" href="https://github.com/liteshz1778/demo_python_flask_app" target="_blank" rel="noopener">
+        <div class="repo-name">demo_python_flask_app</div>
+        <div class="repo-desc">Python Flask demo app used for containerized deployment walkthroughs.</div>
+        <div class="repo-lang">Python</div>
+      </a>
+      <a class="repo-card" href="https://github.com/liteshz1778/ansible_simple_ecommerce_app_project" target="_blank" rel="noopener">
+        <div class="repo-name">ansible_simple_ecommerce_app_project</div>
+        <div class="repo-desc">Ansible playbooks provisioning a sample e-commerce app end to end.</div>
+        <div class="repo-lang">Jinja</div>
+      </a>
+      <a class="repo-card" href="https://github.com/liteshz1778/python_aws_boto3_usecases" target="_blank" rel="noopener">
+        <div class="repo-name">python_aws_boto3_usecases</div>
+        <div class="repo-desc">Boto3 scripts for AWS automation — audits, cleanup, and cost optimization use cases.</div>
+        <div class="repo-lang">Python</div>
+      </a>
+      <a class="repo-card" href="https://github.com/liteshz1778/terraform_aws" target="_blank" rel="noopener">
+        <div class="repo-name">terraform_aws</div>
+        <div class="repo-desc">Terraform modules and practice configs for provisioning AWS resources.</div>
+        <div class="repo-lang">HCL</div>
+      </a>
+      <a class="repo-card" href="https://github.com/liteshz1778/ansible_practise" target="_blank" rel="noopener">
+        <div class="repo-name">ansible_practise</div>
+        <div class="repo-desc">Working playbooks and roles used to sharpen Ansible fundamentals.</div>
+        <div class="repo-lang">Shell</div>
+      </a>
+    </div>
+    <div style="margin-top:16px;">
+      <a class="repo-row-more" href="https://github.com/liteshz1778?tab=repositories" target="_blank" rel="noopener">View all repos on GitHub →</a>
+    </div>
+  </div>
+</section>
+
+<section id="contact" style="border-top:none;">
+  <div class="wrap contact-cta">
+    <h2>Let's ship something reliable.</h2>
+    <p>Open to AWS DevOps, SRE, and Platform Engineering roles.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="mailto:zadane1778.litesh@gmail.com">Email me →</a>
+	  <a class="btn btn-ghost" href="tel:+918788485192">Call +91 8788485192</a>
+      <a class="btn btn-ghost" href="https://github.com/liteshz1778" target="_blank" rel="noopener">View GitHub</a>
+	  <a class="btn btn-ghost" href="https://hub.docker.com/u/liteshz" target="_blank" rel="noopener">View DockerHub</a>
+    </div>
+  </div>
+</section>
+
+<button class="back-to-top" id="backToTop" aria-label="Back to top">↑</button>
+
+<footer>
+  Litesh Zadane — Pune, Maharashtra, India · Built and deployed on Vercel
+  <div class="uptime-line">session uptime: <span id="uptime">00:00:00</span></div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
