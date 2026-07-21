@@ -142,6 +142,10 @@
   .stat-num{
     font-family:var(--display);font-size:36px;font-weight:600;color:var(--teal);
   }
+  .stat-num.loading{
+    font-family:var(--mono);font-size:13px;font-weight:500;color:var(--text-faint);
+    letter-spacing:0;
+  }
   .stat-label{
     font-family:var(--mono);font-size:11px;color:var(--text-faint);
     text-transform:uppercase;margin-top:6px;letter-spacing:0.04em;
@@ -341,7 +345,7 @@
         <div class="stat-label">AWS services used</div>
       </div>
       <div>
-        <div class="stat-num" data-target="42" data-suffix="" id="stat4">0</div>
+        <div class="stat-num loading" data-target="40" data-suffix="" id="stat4">Fetching…</div>
         <div class="stat-label">public repos</div>
       </div>
     </div>

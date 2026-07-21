@@ -9,15 +9,23 @@
       const statEl = document.getElementById('stat4');
       if(statEl){
         statEl.dataset.target = data.public_repos;
-        // Write the final value directly too — the count-up animation may have
-        // already fired (and stopped observing) before this fetch resolved.
         const suffix = statEl.dataset.suffix || '';
         statEl.textContent = data.public_repos + suffix;
+        statEl.classList.remove('loading');
       }
       const chip = document.getElementById('repoCountChip');
       if(chip) chip.textContent = data.public_repos + ' repos';
     })
-    .catch(() => { /* keep hardcoded fallback values in the HTML */ });
+    .catch(() => {
+      // Fetch failed — fall back to the hardcoded data-target value instead
+      // of leaving "Fetching…" showing forever.
+      const statEl = document.getElementById('stat4');
+      if(statEl){
+        const suffix = statEl.dataset.suffix || '';
+        statEl.textContent = statEl.dataset.target + suffix;
+        statEl.classList.remove('loading');
+      }
+    });
 })();
 
 // Terminal typing effect
@@ -148,4 +156,4 @@ const statObserver = new IntersectionObserver((entries) => {
     }
   });
 }, { threshold: 0.5 });
-statEls.forEach(el => statObserver.observe(el));
+statEls.forEach(el => { if(el.id !== 'stat4') statObserver.observe(el); });
